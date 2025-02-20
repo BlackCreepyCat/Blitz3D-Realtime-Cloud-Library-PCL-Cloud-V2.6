@@ -1,0 +1,980 @@
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<body bgcolor="#ffffff">
+<h1><font color="#0000ff"></a>PCL_Cloud V2.6 Manual:</font></h1>
+<p>This Function-Library is designed for Blitzbasic3D V1.90 and higher, to generate 
+  Clouds and Clusters, based of Particles. The particle inhabits 4 polygons with a vertex at center, instead of normal particles with 2 polygons. This lets the particle appear like a smoothed pyramid, showed from top, to give him a voluminous look with vertex-lightning. <br>
+You can generate clouds with various shapes, throu meshes. Use all normal B3D Features like Textures,Blend-Modes,FX-Flags,Collision, etc. with these clouds. Split the clouds into groups to give them various attributes.<br>
+See the demo-soucrecodes how to use this functions.<br>
+<b>shadow-demo:</b> demonstrates the shadowing of clouds with Autolightning and different alpha-textures<br>
+<b>cloudfield-test:</b> shows how to use prerendered cloud-shadowing with fixed lightsources.<br>
+<b>glowing-clouds:</b> does the same but with using of groups to generate a glowing core.<br>
+<b>wood: </b>shows how to use PCL_Cloud to generate trees.<br> 
+<b>collisiontest: </b>shows how to use PCL_ParticleType to use collisions.<br> 
+<b>savecloud and loadcloud: </b>savecloud saves a cloud under savedcloud.txt and loadcloud loads it.<br> 
+You will see, that these functions can generate a wide range of effects</p>
+<P> <b><u>Changes since Version 1.0:</b></U><br>
+Fixed: PCL_NewCloud() has slightly improved particle placing for better results.<br>
+Fixed: PCL_SetCloudShininess() appears in manual but not in the library. Sorry. <br>
+Changed: PCL_SetTempPos is no longer needed and removed.<br>
+Changed: PCL_SetCloudTexture()´s parameter changed, to store texture-flags and -modes inside the cloud-structures.<br>
+Changed: PCL_PaintParticle() was removed. It was needed. There is no way to read out B3D-Brush properties. <br>
+Changed: PCL_SetNearFade() has now the optional group-Parameter. <br>
+ Added: PCL_SaveCloud() and PCL_LoadCloud() included to load former saved Clouds, i.e. as templates.<br>
+Added: PCL_UpdateCollisionZones() to update Entity´s box 
+and radius after use of Scaleentity for this cloud or its parent entity. </P>
+<P><STRONG><U>Changes since Version 2.0:</U></STRONG><BR>
+           Fixed: PCL_NewCloud() was sometimes generating groups without particles. <br>
+
+Changed: 
+PCL_SetNearFade() has now optional parameter to set a fix range for 
+nearfading.<BR>Changed: PCL_SetAutoFade() has now the optional group-Parameter. 
+<BR>Added: PCL_PointParticle() to let particle face a specific entity<BR>Added: 
+PCL:CopyCloud() to copy another cloud.</P>
+
+<P><STRONG><U>Changes since Version 2.5:</U></STRONG><BR>
+Fixed: PCL_LoadCloud() was generating empty clouds, if the cloudfile was not loaded. <br>
+Fixed: PCL_SaveCloud() does not save some clouds, if more then one cloud was active. <br>
+Fixed: Some little bugs and issues. <br>
+Changed: PCL_SetCloudTexture() has now 5 optional parameters to set Texture-Geometry. Please check your code, if you use the new version. <BR>
+</P>
+<a name="back">
+<h3><b>List of Commands:</b></h3>
+<h3><A href="#new">PCL_NewCloud</A><br>
+  <A href="#save">PCL_SaveCloud</A> <br>
+  <A href="#load">PCL_LoadCloud</A> <br>
+  <A href="#copy">PCL_CopyCloud</A> <br>
+  <A href="#del">PCL_DeleteCloud</A> <br>
+  <A href="#scale">PCL_SetParticleScale</A> <br>
+  <A href="#timer">PCL_SetTimer </A><br>
+  <A href="#update">PCL_UpdateClouds </A><br>
+  <A href="#update2">PCL_UpdateCloud</A><br>
+  <A href="#light">PCL_SetLight</A><br>
+  <A href="#amblight">PCL_SetAmbientLight</A><br>
+  <A href="#auto">PCL_SetAutoLightning</A><br>
+  <A href="#camera">PCL_SetCamera</A><BR>
+  <A href="#point">PCL_PointParticle</A><BR>
+  <A href="#nearfade">PCL_SetNearFade</A><br>
+  <A href="#autofade">PCL_SetAutofade</A><br>
+  <A href="#rotate">PCL_RotateParticle</A><br>
+  <A href="#pos">PCL_SetRandomPos</A><br>
+  <A href="#color">PCL_SetParticleColor</A><br>
+  <A href="#speed">PCL_SetColorSpeed</A><br>
+  <A href="#alpha">PCL_SetCloudAlpha</A><br>
+  <A href="#shini">PCL_SetCloudShininess</A><br>
+  <A href="#texture">PCL_SetCloudTexture</A><br>
+  <A href="#blend">PCL_SetCloudBlend</A><br>
+  <A href="#fx">PCL_SetCloudFx</A><br>
+  <A href="#type">PCL_SetParticleType</A><br>
+  <A href="#radius">PCL_UpdateCollisionZones</A><br>
+</h3>
+<h3><a name="new"></a>PCL_NewCloud( mesh , amount , [groups] ) </h3>
+<p><b>Description:</b> Generates a new cloud from a given shape with a specified 
+  amount of particles and returns the handle of the cloud.<b> </b></p>
+<table width="98%" border="0">
+  <tr> 
+    <td width="10%"><b>mesh:</b></td>
+    <td width="90%" rowspan="2"> 
+      <p>A valid Mesh. Do Not give an empty mesh, otherwise you will get an "Memory 
+        Access Violation". The mesh must have at least one triangle. </p>
+      <p> </p>
+    </td>
+  </tr>
+  <tr> 
+    <td width="10%">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td width="10%" height="2"> 
+      <div align="left"><b>amount:</b></div>
+    </td>
+    <td width="90%" rowspan="2">Amount of Particles between 1-200. More then 200 
+      Particles causes an Errormessage. 0 generates an empty cloud. If you wish 
+      to have more than 200 particles per cloud, change the constant <b>pcl_count</b> 
+      at the top of the pcl-sourcecode </td>
+  </tr>
+  <tr> 
+    <td width="10%" height="2">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td width="10%" height="19"><b>groups:</b></td>
+    <td width="90%" rowspan="2">Splits the particles into the given amount of 
+      groups. Every group can have seperate Colors,Textures, Blend- and FX-mode,Alpha,Pickmode 
+      etc. The Number of groups 
+      is limited by the amount of particles. Default-Setting is 1.</td>
+  </tr>
+  <tr>
+    <td width="10%" height="40">&nbsp;</td>
+  </tr>
+</table>
+<b><A href="#back">back </A></b> 
+
+<hr>
+<h3><a name="save"></a>PCL_SaveCloud( handle , file$ )</h3>
+<p><b>Description:</b> Saves a Cloud with all groups and properties under the given filename. <br>
+Note! Texture-filenames are saved without a path. For loading, make sure that the cloud-file and textures are in the same directory.</p>
+<table width="98%" border="0">
+  <tr> 
+    <td rowspan="2"><b>handle:</b></td>
+    <td width="90%" rowspan="2"> 
+      <p>Cloud-Handle </p>
+    </td>
+  </tr>
+  <tr> </tr>
+  <tr> 
+    <td rowspan="2" height="42"> 
+      <div align="left"><b>file$</b></div>
+    </td>
+    <td width="90%" rowspan="2"> A valid path, and a file. If the file does not exist, he will be created. There is no extension reserved. Its on you, which extension you will use.</td>
+  </tr>
+  <tr> </tr>
+</table>
+<b><A href="#back">back </A></b> 
+<hr>
+<h3><a name="load"></a>PCL_LoadCloud( file$ , [parent] )</h3>
+<p><b>Description:</b> Loads a Cloud from given path and returns the Cloud-Handle. Make sure that the file is a saved cloud, otherwise reading errors will be occur.<br>
+Important! Cameras and Lights, which are former been set, are not saved. After loading they must been set again, before UpdateCloud() or UpdateClouds() is calling. </p>
+<table width="98%" border="0">
+  <tr> 
+    <td rowspan="2"><b>file$:</b></td>
+    <td width="90%" rowspan="2"> 
+      <p>Cloud-Handle </p>
+    </td>
+  </tr>
+  <tr> </tr>
+  <tr> 
+    <td rowspan="2" height="42"> 
+      <div align="left"><b>parent</b></div>
+    </td>
+    <td width="90%" rowspan="2"> Optional. This allows you to set the parent entity of Cloud. This will still result in the cloud being created at position 0,0,0 rather than at the parent entity's position. 
+ </td>
+  </tr>
+  <tr> </tr>
+</table>
+<b><A href="#back">back </A></b> 
+<hr>
+<h3><a name="copy"></a>PCL_CopyCloud(handle) </h3>
+<p><b>Description:</b> Copies the given cloud and returns the Cloud-handle.</p>
+<table width="98%" border="0">
+  <tr> 
+    <td rowspan="2"> <b>handle:</b></td>
+    <td width="90%" rowspan="2"> 
+      <p>Cloud that should be copied. </p>
+    </td>
+  </tr>
+  <tr> </tr>
+</table>
+<b><A href="#back">back </A></b> 
+<hr>
+<h3><a name="del"></a>PCL_DeleteCloud(handle) </h3>
+<p><b>Description:</b> Deletes a former created cloud </p>
+<table width="98%" border="0">
+  <tr> 
+    <td rowspan="2"> <b>handle:</b></td>
+    <td width="90%" rowspan="2"> 
+      <p>Cloud to be delete. </p>
+    </td>
+  </tr>
+  <tr> </tr>
+</table>
+<b><A href="#back">back </A></b> 
+<hr>
+<h3></h3>
+<h3><a name="scale"></a>PCL_SetParticleScale ( handle , scale-min# , scale-max# 
+  , mode , [group] ) </h3>
+<p><b>Description:</b> Scaling Cloud-Particles: </p>
+<table border="0" width="99%">
+  <tr> 
+    <td width="9%" height="17"><b>handle:</b></td>
+    <td width="91%" height="17">Cloud-Handle </td>
+  </tr>
+  <tr> 
+    <td width="9%"><b>scale_min#:</b></td>
+    <td width="91%"> Start of Scaling-Range </td>
+  </tr>
+  <tr> 
+    <td rowspan="2" width="9%"><b>scale_max#:</b></td>
+    <td width="91%" rowspan="2"> 
+      <p> End of Scaling-Range</p>
+    </td>
+  </tr>
+  <tr> </tr>
+  <tr> 
+    <td width="9%" height="6"> 
+      <div align="left"><b>mode:</b></div>
+    </td>
+    <td width="91%" rowspan="2"> Will mostly be used after PCL_NewCloud(). Move 
+      the particle towards or away from cloudcenter with the same amount of its 
+      own given scale. This places the scaled particles inside or outside the 
+      border of the given Cloud-Shape.<br>
+      1 = no Change. Particle-Position will be not changed.<br>
+      2 = Particles will be placed inside the Cloud-Shape.<br>
+      3 = Particles will be placed outside the Cloud-Shape.</td>
+  </tr>
+  <tr> 
+    <td width="9%" height="40">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td width="9%" height="14"><b>group:</b></td>
+    <td rowspan="2">Optionally Parameter, to choose a specific group of particles. 
+      Default is set to 0, so all particles will be affected.</td>
+  </tr>
+  <tr> 
+    <td width="9%" height="12">&nbsp;</td>
+  </tr>
+</table>
+<b><A href="#back">back </A></b> 
+<hr>
+<h3></h3>
+<h3><a name="timer"></a>PCL_SetTimer()</h3>
+<p><b>Description:</b> Sets the starting value for internal looptime for PCL_UpdateClouds(). 
+  (see below, next Command) </p>
+<b><A href="#back">back </A></b> 
+<hr>
+<h3></h3>
+<h3><a name="update"></a>PCL_UpdateClouds([looptime#])</h3>
+<p><b>Description:</b> Updates Light, Shadow,Pointing and Fading of all active 
+  Clouds. Use this Command in Mainloops. The Light/Shadow Calculation changes 
+  the color of Particles smoothly, during the Mainloop runs. This is not really 
+  fast enough for Realtime, so only a part of particles of one Cloud will be changed 
+  per frame. At next frame the next cloud will be done, and so on. </p>
+<table width="98%" border="0">
+  <tr> 
+    <td width="10%"><b>looptime#:</b></td>
+    <td width="90%" rowspan="2"> 
+      <p>Optionally. This is a special value with the amount of time in seconds, 
+        that the last frame has needed to be done. See the Example. Code: </p>
+    </td>
+  </tr>
+  <tr>
+    <td width="10%" height="2">&nbsp;</td>
+  </tr>
+  <tr>
+    <td width="10%">&nbsp;</td>
+    <td width="90%"> 
+      <p><font color="#336633">time=Millisecs() <font color="#000000">&lt;-sets the 
+        starting value</font> <br>
+        While Keyhit(1)=0 <font color="#000000">&lt;-begin Mainloop</font> <br>
+        looptime#=(Millisecs()-time)/1000.0 <font color="#000000">&lt;-calculate 
+        time between this point and the last call of Millisecs() </font><br>
+        time=millisecs() <font color="#000000">&lt;-stores the actual time for the 
+        next frame</font> <br>
+        <font color="#000000">;doing your stuff</font> <br>
+        MoveEntity cube,0,0,100*looptime# <font color="#000000">&lt;- moves the cube 
+        100 unit per second forward</font><br>
+         Ifc&lt;255<br>
+        c=c+100*looptime# : entitcolor cube,c,c,c <font color="#000000">&lt;-rises 
+        the color of the cube in 2,55 seconds form 0 to 255</font><br>
+        Endif<br>
+        Renderworld()<br>
+        Flip <br>
+        Wend</font></p>
+    </td>
+  </tr>
+  <tr> 
+    <td width="10%">&nbsp;</td>
+    <td width="90%"> The variable looptime# stores now the time, the mainloop 
+      has needed for one frame, in seconds. Now you can use this to make all motions, 
+      rotations, simply all changes timebased,that done during the loop runs . 
+      All changes now independent from the FPS.<br>
+      If you don´t use those system, type simply PCL_UpdateClouds(). Now PCL_UpdateClouds() 
+      generates his own looptime for internal use. To avoid unpredictable results 
+      at start, you should call PCL_SetTimer() before the mainloop starts. </td>
+  </tr>
+</table>
+<b><A href="#back">back </A></b> 
+<hr>
+<h3></h3>
+<h3><a name="update2"></a>PCL_UpdateCloud(handle)</h3>
+<p><b>Description:</b> Updates Light and Shadow for the specified Cloud. The difference 
+  to PCL_UpdateClouds() is, that the changes for all Particles immediatly are 
+  made at once and only one time per call. This tooks more time than PCL_UpdateClouds() 
+  and is not useful for Realtime. You can use this for Clouds that will not be 
+  moved or rotated or something, and when the Light stands still, so that no changes 
+  in lightning occurs. Now you can call this Command once per Cloud at start and 
+  set autolightning to 0. ( see also PCL_AutoLightning() ).</p>
+<table width="98%" border="0">
+  <tr> 
+    <td rowspan="2"><b>handle:</b></td>
+    <td width="90%" rowspan="2"> 
+      <p>Cloud-Handle </p>
+    </td>
+  </tr>
+  <tr> </tr>
+</table>
+<b><A href="#back">back </A></b> 
+<hr>
+<h3></h3>
+<h3><a name="light"></a>PCL_SetLight( handle , light-handle , renderstep)</h3>
+<p><b>Description:</b> Sets the "Light-Entity" for the specified Cloud.</p>
+<table width="98%" border="0">
+  <tr> 
+    <td rowspan="2"><b>handle:</b></td>
+    <td width="90%" rowspan="2"> 
+      <p> Cloud-Handle </p>
+    </td>
+  </tr>
+  <tr> </tr>
+  <tr> 
+    <td width="10%" height="2"> 
+      <div align="left"><b>light_handle:</b></div>
+    </td>
+    <td width="90%" rowspan="2"> Light-Entity. This Entity must not be a real 
+      B3D-Light. It can be every valid Entity. The position of this Entity gives 
+      the direction for Autolightning. Its independent from normal lightning by 
+      B3D-Lights </td>
+  </tr>
+  <tr> 
+    <td width="10%" height="26">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td width="10%" height="16"><b>renderstep:</b></td>
+    <td rowspan="2">sets the steps between light and dark side of a cloud. Lower 
+      values are made finer steps from light to dark, but tooks more time to calculate. 
+      Useful values from 1 to 100. </td>
+  </tr>
+  <tr> 
+    <td width="10%" height="5">&nbsp;</td>
+  </tr>
+</table>
+<b><A href="#back">back </A></b> 
+<hr>
+<h3><a name="amblight"></a>PCL_SetAmbientLight( handle ,r,g,b)</h3>
+<p><b>Description:</b> Sets the Ambient Light-Level for the specified Cloud. Can 
+  be different from B3D-Ambient Light. Useful by low B3D-Ambient Light, to make 
+  Clouds lighter with Autolightning. </p>
+<table width="98%" border="0">
+  <tr> 
+    <td rowspan="2"><b>handle:</b></td>
+    <td width="90%" rowspan="2"> 
+      <p>Cloud-Handle </p>
+    </td>
+  </tr>
+  <tr> </tr>
+  <tr> 
+    <td rowspan="2" height="42"> 
+      <div align="left"><b>r,g,b</b></div>
+    </td>
+    <td width="90%" rowspan="2"> Red,Green,Blue Components of Ambient Light, between 
+      0 and 255.</td>
+  </tr>
+  <tr> </tr>
+</table>
+<b><A href="#back">back </A></b> 
+<hr>
+<h3></h3>
+<h3><a name="auto"></a>PCL_SetAutoLightning(handle,auto)</h3>
+<p><b>Description:</b> Sets the Auto Lightning for the specified Cloud. </p>
+<table width="98%" border="0">
+  <tr> 
+    <td rowspan="2"><b>handle:</b></td>
+    <td width="90%" rowspan="2"> 
+      <p>Cloud-Handle </p>
+    </td>
+  </tr>
+  <tr> </tr>
+  <tr> 
+    <td width="10%" height="2"> 
+      <div align="left"><b>auto: </b></div>
+    </td>
+    <td width="90%" rowspan="2"> 
+      <p>1 or 0. Enables/Disables Light-,Darkside Calculation for this cloud, 
+        by PCL_UpdateClouds().<br>
+        Remember, a light-entity must be set. ( see above) </p>
+      </td>
+  </tr>
+  <tr> 
+    <td width="10%" height="2">&nbsp;</td>
+  </tr>
+</table>
+<b><A href="#back">back </A></b> 
+<hr>
+<h3></h3>
+<h3><a name="camera"></a>
+<H3><A name=camera></A>PCL_SetCamera( handle , camera-handle , point , [random] 
+)</H3>
+<P><B>Description: </B>Sets the Camera for the specified Cloud.</P>
+<TABLE width="98%" border=0>
+  
+  <TR>
+    <TD rowSpan=2><B>handle:</B></TD>
+    <TD width="90%" rowSpan=2>
+      <P>Cloud-Handle </P></TD></TR>
+  <TR></TR>
+  <TR>
+    <TD width="10%" height=2>
+      <DIV align=left><B>camera_handle:</B></DIV></TD>
+    <TD width="90%" rowSpan=3>A valid B3D-CameraHandle created with 
+      CreateCamera(). The position of this Camera will be needed for Nearfading 
+      and pointing</TD></TR>
+  <TR></TR>
+  <TR></TR>
+  <TR>
+    <TD height=37 rowSpan=2><B>point: </B></TD>
+    <TD width="90%" rowSpan=2>1 or 0. Enables/Disables, the particles faces 
+      the Camera. </TD></TR>
+  <TR></TR>
+  <TR>
+    <TD height=37 rowSpan=2><B>random: </B></TD>
+    <TD width="90%" rowSpan=2>Optionally Parameter with 1 or 0. 
+      Enables/Disables, the particles faces the Camera with random z-angle. 
+      Default is set to 0.</TD></TR>
+  <TR></TR></TABLE><B><A href="#back">back </A></B>
+<HR>
+<H3><A name=point></A>PCL_PointParticle( handle , entity , [random] , 
+[group])</H3>
+<P><B>Description: </B>Sets an Entity for the particles to face to.</P>
+<TABLE width="98%" border=0>
+  
+  <TR>
+    <TD rowSpan=2><B>handle:</B></TD>
+    <TD width="90%" rowSpan=2>
+      <P>Cloud-Handle </P></TD></TR>
+  <TR></TR>
+  <TR>
+    <TD width="10%" height=2>
+      <DIV align=left><B>entity:</B></DIV></TD>
+    <TD width="90%" rowSpan=3>Any valid Entity-handle, to 
+      point to.<BR>Note: you must set PCL_SetCamera(..,..,0) to disable 
+      Camera-Facing, otherwise PCL_PointParticle will have no effect, when PCL_UpdateClouds() is used.</TD></TR>
+  <TR></TR>
+  <TR></TR>
+  <TR></TR>
+  <TR>
+    <TD height=37><STRONG>random: </STRONG></TD>
+    <TD width="90%"> Optionally Parameter with 1 or 0. Enables/Disables, 
+      the particles faces the&nbsp;Entity with random z-angle. Default is set to 0.</TD></TR>
+  <TR>
+    <TD height=37 rowSpan=2><B>group:</B></TD>
+    <TD width="90%" rowSpan=2>Optionally Parameter, to choose a specific group 
+      of particles. Default is set to 0, so all particles will be 
+affected.</TD></TR>
+  <TR></TR></TABLE><B><A href="#back">back </A></B>
+
+<HR>
+<H3><a name="nearfade"></a>PCL_SetNearFade( handle , nearfade , [near#] , [far#] ,&nbsp;[group] )</H3>
+<p><b>Description:</b> Sets the Nearfading for the specified Cloud. </p>
+<table width="1202" border="0" style="WIDTH: 1202px; HEIGHT: 71px">
+  <tr> 
+    <td rowspan="2" width="8%"><b>handle:</b></td>
+    <td width="92%" rowspan="2"> 
+      <p> Cloud-Handle </p>
+    </td>
+  </tr>
+  <tr> </tr>
+  <tr> 
+    <td width="8%" height="2"> 
+      <div align="left"><b>nearfade:</b></div>
+      <DIV align=left><STRONG></STRONG>&nbsp;</DIV>
+      <DIV align=left><STRONG></STRONG>&nbsp;</DIV>
+      <DIV align=left><STRONG></STRONG>&nbsp;</DIV>
+    </td>
+    <td width="92%" rowspan="2">
+      <P>0. Disables Nearfading<BR>1 EnablesNearfading. If 
+      a Particle is closer to Camera as its own scale, he will be faded out. 
+      near# and far# will be ignored<BR>2 EnablesNearfading, but with the given 
+      Range under near# and far#.<BR>       &nbsp;&nbsp; Note: The use of near# and 
+      far# is reversed as with Autofade.</P>         
+                </td>
+  </tr>
+  <tr> </tr>
+  <TR>
+    <TD width="7%" height=2>
+      <DIV align=left><B>near#: </B></DIV></TD>
+    <TD width="93%">distance in front of the camera at which particles will be 
+      invisible </TD></TR>
+  <TR>
+    <TD width="7%" height=2><STRONG>far#: </STRONG></TD>
+    <TD width="93%">distance in front of the camera at which particles will 
+      start being faded </TD></TR>
+  <tr> 
+    <td width="7%" height="2"><b>group:</b></td>
+    <td width="93%" rowspan="2">Optionally Parameter, to choose a specific group 
+      of particles. Default is set to 0, so all particles will be affected.</td>
+  </tr>
+ </table>
+<b><A href="#back">back </A></b> 
+<hr>
+<h3></h3>
+<h3><a name="autofade"></a>PCL_SetAutofade( handle , near# , far# ,[group]&nbsp;)</h3>
+<p><b>Description:</b> Sets Autofading for the specified Cloud. This Command uses 
+  B3D Autofading for max. speed. If you like to disable it later, set both parameter to -1. 
+</p>
+<table width="98%" border="0">
+  <tr> 
+    <td rowspan="2" colSpan=2><b>handle:</b></td>
+    <td width="90%" rowspan="2"> 
+      <p> Cloud-Handle </p>
+    </td>
+  </tr>
+  <tr> </tr>
+  <tr> 
+    <td width="10%" height="2" colSpan=2> 
+      <div align="left"><b>near#: </b></div>
+    </td>
+    <td width="90%"> distance in front of the camera at which particles will start 
+      being faded </td>
+  </tr>
+  <TR>
+    <TD width="10%" colSpan=2 height=18><STRONG>far#: </STRONG></TD>
+    <TD width="90%" height=18>distance in front of the camera at which 
+      particles will be invisible </TD></TR>
+  <TR>
+    <TD width="10%" colSpan=2 height=18><STRONG>group:</STRONG></TD>
+    <TD width="90%" height=18>Optionally Parameter, to choose a specific group 
+      of particles. Default is set to 0, so all particles will be 
+  affected.</TD></TR>
+</table>
+<b><A href="#back">back </A></b> 
+<hr>
+<h3></h3>
+<h3><a name="rotate"></a>PCL_RotateParticle(handle , pitch , yaw , roll , r_pitch 
+  , r_yaw , r_roll , [group])</h3>
+<p><b>Description:</b> Rotates all particle of the specified cloud. You´re able 
+  to set a randow value range for each axis. Remember, you must set PCL_SetCamera(..,..,0) 
+  to disable Camera-Facing. </p>
+<table width="98%" border="0">
+  <tr> 
+    <td width="7%"><b>handle:</b></td>
+    <td width="93%"> 
+      <p>Cloud-Handle </p>
+    </td>
+  </tr>
+  <tr> 
+    <td width="7%"><b>pitch:</b></td>
+    <td width="93%">sets angle for x-axis</td>
+  </tr>
+  <tr> 
+    <td width="7%" height="2"> 
+      <div align="left"><b>yaw: </b></div>
+    </td>
+    <td width="93%">sets angle for y-axis</td>
+  </tr>
+  <tr> 
+    <td width="7%" height="2"><b>roll: </b></td>
+    <td width="93%">sets angle for z-axis </td>
+  </tr>
+  <tr> 
+    <td width="7%" height="6"><b>r_pitch:</b></td>
+    <td width="93%" height="6">:random value for x-axis</td>
+  </tr>
+  <tr> 
+    <td width="7%" height="2"><b>r_yaw: </b></td>
+    <td width="93%">random value for y-axis</td>
+  </tr>
+  <tr> 
+    <td width="7%" height="2"><b>r_roll:</b></td>
+    <td width="93%">random value for z-axis</td>
+  </tr>
+</table>
+<table border="0" width="99%">
+  <tr> 
+    <td width="7%" height="14"><b>group:</b></td>
+    <td rowspan="2" width="93%">Optionally Parameter, to choose a specific group 
+      of particles. Default is set to 0, so all particles will be affected.</td>
+  </tr>
+  <tr> 
+    <td width="7%" height="11">&nbsp;</td>
+  </tr>
+</table>
+<p>PCL_RotateParticle(handle,-90,0,0,0,0,90) &lt;-let all particle show upwards with 
+  random roll-angle<br>
+  PCL_RotateParticle(handle,0,0,0,180,180,180) &lt;-gives all particles a random 
+  orientation </p>
+<b><A href="#back">back </A></b> 
+<hr>
+<h3></h3>
+<h3> <a name="pos"></a>PCL_SetRandomPos(handle , min# , max# , [group] )</h3>
+<p><b>Description:</b> Moves the partilce towards or away from cloud-center with 
+  random value between min and max value. A value of 1 means, the particle does 
+  not change his position. Lesser than 1, the particle moves towards to center, 
+  greater than 1, he moves away from center. </p>
+<table width="98%" border="0">
+  <tr> 
+    <td rowspan="2"><b>handle:</b></td>
+    <td width="90%" rowspan="2"> 
+      <p>Cloud-Handle </p>
+    </td>
+  </tr>
+  <tr> </tr>
+  <tr> 
+    <td width="10%" height="2"> 
+      <div align="left"><b>min#:</b></div>
+    </td>
+    <td width="90%">minimum Distance</td>
+  </tr>
+  <tr> 
+    <td width="10%" height="10"><b>max#:</b></td>
+    <td width="90%" height="10">maximum Distance</td>
+  </tr>
+  <tr> 
+    <td width="10%" height="2"><b>group:</b></td>
+    <td width="90%" height="4" rowspan="2">Optionally Parameter, to choose a specific 
+      group of particles. Default is set to 0, so all particles will be affected.</td>
+  </tr>
+  <tr>
+    <td width="10%" height="2">&nbsp;</td>
+  </tr>
+</table>
+<b><A href="#back">back </A></b> 
+<hr>
+<h3> <a name="color"></a>PCL_SetParticleColor(handle , r1 , g1 , b1 , r2 , g2 
+  , b2 , [group] )</h3>
+<p><b>Description:</b> Sets color-range for the particles between r1,g1,b1 and 
+  r2,g2,b2.</p>
+<table width="98%" border="0">
+  <tr> 
+    <td width="7%"><b>handle:</b></td>
+    <td width="93%"> 
+      <p>Cloud-Handle </p>
+    </td>
+  </tr>
+  <tr> 
+    <td width="7%"><b>r1,g1,b1</b></td>
+    <td width="93%">sets Red,Green,Blue-component for starting color</td>
+  </tr>
+  <tr> 
+    <td width="7%" height="6"><b>r2,g2,b2</b></td>
+    <td width="93%" height="6">sets Red,Green,Blue-component for end color</td>
+  </tr>
+  <tr> 
+    <td width="7%" height="2"><b>group:</b></td>
+    <td width="93%" rowspan="2">Optionally Parameter, to choose a specific group 
+      of particles. Default is set to 0, so all particles will be affected.</td>
+  </tr>
+  <tr> 
+    <td width="7%" height="2">&nbsp;</td>
+  </tr>
+</table>
+<b><A href="#back">back </A></b> 
+<hr>
+<h3> <a name="speed"></a>PCL_SetColorSpeed( handle , speed# )</h3>
+<p><b>Description:</b>Sets the speed, at which colors of particles will changed 
+  during Light/Shadow calculation with PCL_UpdateClouds(). A value of 1 means, 
+  that a change from white to black (FFFFFF -&gt; 000000) needs one second. Lesser 
+  values makes it slower, greater values faster. Useful values between 0 and 2.</p>
+<table width="98%" border="0">
+  <tr> 
+    <td width="8%"><b>handle:</b></td>
+    <td width="92%"> 
+      <p>Cloud-Handle </p>
+    </td>
+  </tr>
+  <tr> 
+    <td rowspan="2" width="8%"><b>speed#:</b></td>
+    <td width="92%" rowspan="2"> 
+      <p>value for Colorchange with PCL_UpdateClouds(). Default ist set to 0.5</p>
+    </td>
+  </tr>
+  <tr> </tr>
+</table>
+<b><A href="#back">back </A></b> 
+<hr>
+<h3><a name="alpha"></a>PCL_SetCloudAlpha( handle , min# , max# , [group] )</h3>
+<p><b>Description:</b> Sets Alpha-Range for particles between min# and max#. Useful 
+  values between 0 and 1.</p>
+<table width="98%" border="0">
+  <tr> 
+    <td width="8%"><b>handle:</b></td>
+    <td width="92%"> 
+      <p>Cloud-Handle </p>
+    </td>
+  </tr>
+  <tr> 
+    <td width="10%" height="2"> 
+      <div align="left"><b>min#:</b></div>
+    </td>
+    <td width="90%">minimum Alpha</td>
+  </tr>
+  <tr> 
+    <td width="10%" height="10"><b>max#:</b></td>
+    <td width="90%" height="10">maximum Alpha</td>
+  </tr>
+  <tr> 
+    <td width="7%" height="2"><b>group:</b></td>
+    <td width="93%" rowspan="2">Optionally Parameter, to choose a specific group 
+      of particles. Default is set to 0, so all particles will be affected.</td>
+  </tr>
+  <tr> 
+    <td width="7%" height="2">&nbsp;</td>
+  </tr>
+</table>
+<b><A href="#back">back </A></b> 
+<hr>
+<h3><a name="shini"></a>PCL_SetCloudShininess( handle , min# , max# , [group] )</h3>
+<p><b>Description:</b> Sets Vertex-Shininess for particles between min# and max#. Useful 
+  values between 0 and 1.</p>
+<table width="98%" border="0">
+  <tr> 
+    <td width="8%"><b>handle:</b></td>
+    <td width="92%"> 
+      <p>Cloud-Handle </p>
+    </td>
+  </tr>
+  <tr> 
+    <td width="10%" height="2"> 
+      <div align="left"><b>min#:</b></div>
+    </td>
+    <td width="90%">minimum Shininess</td>
+  </tr>
+  <tr> 
+    <td width="10%" height="10"><b>max#:</b></td>
+    <td width="90%" height="10">maximum Shininess</td>
+  </tr>
+  <tr> 
+    <td width="7%" height="2"><b>group:</b></td>
+    <td width="93%" rowspan="2">Optionally Parameter, to choose a specific group 
+      of particles. Default is set to 0, so all particles will be affected.</td>
+  </tr>
+  <tr> 
+    <td width="7%" height="2">&nbsp;</td>
+  </tr>
+</table>
+<b><A href="#back">back </A></b> 
+<hr>
+<h3><a name="texture"></a>PCL_SetCloudTexture( handle , file$ , [flag] , [blend], [scale_x#], [scale_y#], [rot#], [pos_x#], [pos_y#] , [index] , [group] )
+  )</h3>
+<p><b>Description:</b> Applies textures to particles. Texture-file ,flags and blendmodes 
+  are set as seperate parameter, so PCL_cloud can store this, to save it later.</p>
+<table width="98%" border="0">
+  <tr> 
+    <td width="8%"><b>handle:</b></td>
+    <td width="92%"> 
+      <p>Cloud-Handle </p>
+    </td>
+  </tr>
+  <tr> 
+    <td width="10%"><b>file$:</b></td>
+    <td width="90%">A valid texture file, like .bmp, .jpg, .tga and .png files</td>
+  </tr>
+  <tr> 
+    <td width="8%"><b>flag:</b></td>
+    <td width="92%"> 
+      <p>Optional. Set texture-flags to add effects to texture. All common B3D-texture-flags are aviable. Default is set to 1.</p>
+    </td>
+  </tr>
+  <tr> 
+    <td width="8%"><b>blend:</b></td>
+    <td width="92%"> 
+      <p>Optional. Set texture-blend to blend with texture-layers below. All common B3D-texture-blendmodes are aviable. Default is set to 2.</p>
+    </td>
+  </tr>
+  <tr> 
+    <td width="7%" height="2"><b>scale_x#<br>scale_y#:</b></td>
+    <td width="93%" rowspan="2">Optionally Parameter, to set the texture-scale 
+      . Default is set to 1 for both.</td>
+  </tr>
+  <tr> 
+    <td width="7%" height="2">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td width="7%" height="2"><b>rot#:</b></td>
+    <td width="93%" rowspan="2">Optionally Parameter, to choose the texture-rotation 
+      . Default is set to 0.</td>
+  </tr>
+  <tr> 
+    <td width="7%" height="2">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td width="7%" height="2"><b>pos_x#<br>pos_y#:</b></td>
+    <td width="93%" rowspan="2">Optionally Parameter, to set the texture-position 
+      . Default is set to 0 for both.</td>
+  </tr>
+  <tr> 
+    <td width="7%" height="2">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td width="7%" height="2"><b>index:</b></td>
+    <td width="93%" rowspan="2">Optionally Parameter, to choose a texture-layer 
+      between 0 and 7. Default is set to 0.</td>
+  </tr>
+  <tr> 
+    <td width="7%" height="2">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td width="10%" height="2"> 
+      <div align="left"><b>group:</b></div>
+    </td>
+    <td width="90%" rowspan="2">Optionally Parameter, to choose a specific group 
+      of particles. Default is set to 0, so all particles will be affected.</td>
+  </tr>
+  <tr> 
+    <td width="10%" height="40">&nbsp;</td>
+  </tr>
+</table>
+<b><A href="#back">back </A></b> 
+
+<hr>
+<h3><a name="blend"></a>PCL_SetCloudBlend( handle , blendmode , [group] )</h3>
+<p><b>Description:</b> Sets Blendmode for particles like EntityBlend (Alpha/Multiply/Add 
+  ) .</p>
+<table width="98%" border="0">
+  <tr> 
+    <td width="8%"><b>handle:</b></td>
+    <td width="92%"> 
+      <p>Cloud-Handle </p>
+    </td>
+  </tr>
+  <tr> 
+    <td width="10%" height="19"><b>blendmode:</b></td>
+    <td width="90%" rowspan="2">Blendmode of the particle.<br>
+      1: Alpha (default)<br>
+      2: Multiply<br>
+      3: Add </td>
+  </tr>
+  <tr> 
+    <td width="10%">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td width="10%" height="2"> 
+      <div align="left"><b>group:</b></div>
+    </td>
+    <td width="90%" rowspan="2">Optionally Parameter, to choose a specific group 
+      of particles. Default is set to 0, so all particles will be affected.</td>
+  </tr>
+  <tr> 
+    <td width="10%" height="6">&nbsp;</td>
+  </tr>
+</table>
+<b><A href="#back">back </A></b> 
+<hr>
+<h3><a name="fx"></a>PCL_SetCloudFx( handle , flag , [group] )</h3>
+<p><b>Description:</b> Sets misc effects for particles like EntityFx. Add flags 
+  to combine effects</p>
+<table width="98%" border="0">
+  <tr> 
+    <td width="8%"><b>handle:</b></td>
+    <td width="92%"> 
+      <p>Cloud-Handle </p>
+    </td>
+  </tr>
+  <tr> 
+    <td width="10%" height="17"><b>flag:</b></td>
+    <td width="90%" rowspan="4">0: nothing (default)<br>
+      1: full-bright<br>
+      2: use vertex colors instead of brush color<br>
+      4: flatshaded<br>
+      8: disable fog<br>
+      16: disable backface culling<br>
+      32: force alpha-blending </td>
+  </tr>
+  <tr> 
+    <td width="10%">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td width="10%">&nbsp;</td>
+  </tr>
+  <tr>
+    <td width="10%">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td width="10%" height="2"> 
+      <div align="left"><b>group:</b></div>
+    </td>
+    <td width="90%" rowspan="2">Optionally Parameter, to choose a specific group 
+      of particles. Default is set to 0, so all particles will be affected.</td>
+  </tr>
+  <tr> 
+    <td width="10%" height="2">&nbsp;</td>
+  </tr>
+</table>
+<b><A href="#back">back </A></b> 
+<hr>
+<h3> <a name="type"></a>PCL_SetParticleType( handle , type , pickmode , obscurer 
+  , [group] )</h3>
+<p><b>Description:</b> Sets an EntityType and Pickmode for the particles.<br>
+  The type will be used with Collisions. Example: You sets a cloud with little 
+  particles in a wide range, with a masked texture of asteroids. Now you should 
+  sets spheric collision with this particles.<br>
+  The Pickmode and the Obscurer will mostly used with EntityVisible. Example: 
+  You have a sun with Lensflares. If the sun is behind a Cloud, or you fly throu, 
+  you can check with EntityVisible(), if the Lensflare should be active or not.</p>
+<table width="98%" border="0">
+  <tr> 
+    <td width="8%"><b>handle:</b></td>
+    <td width="92%"> 
+      <p>Cloud-Handle </p>
+    </td>
+  </tr>
+  <tr> 
+    <td width="10%"><b>type:</b></td>
+    <td width="90%" rowspan="2"> 
+      <p>Sets the collision type for an entity. A collision_type value of 0 indicates 
+        that no collision checking will occur with that entity. A collision value 
+        of 1-999 will mean collision checking will occur.<br>
+        Collision-Radius and -Box will be set automatically.</p>
+    </td>
+  </tr>
+  <tr> 
+    <td width="10%" height="22">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td width="10%" height="26"><b>pickmode:</b></td>
+    <td width="90%" rowspan="3">type of geometry used for picking:<br>
+      0: Unpickable (default)<br>
+      1: Sphere (EntityRadius is used)<br>
+      2: Polygon<br>
+      3: Box (EntityBox is used)</td>
+  </tr>
+  <tr> 
+    <td width="10%">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td width="10%">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td width="10%"><b>obscurer:</b></td>
+    <td width="90%"> True to determine that the entity 'obscures' other entities 
+      during an EntityVisible call.</td>
+  </tr>
+  <tr> 
+    <td width="10%" height="2"> 
+      <div align="left"><b>group:</b></div>
+    </td>
+    <td width="90%" rowspan="2">Optionally Parameter, to choose a specific group 
+      of particles. Default is set to 0, so all particles will be affected.</td>
+  </tr>
+  <tr> 
+    <td width="10%" height="19">&nbsp;</td>
+  </tr>
+</table>
+<b><A href="#back">back </A></b> 
+<hr>
+<h3><a name="radius"></a>PCL_UpdateCollisionzones(handle) </h3>
+<p><b>Description:</b> Updates the size of particles collisionbox and -radius. Mostly used after an ScaleEntity of the whole cloud. If you scale an entity, the box and radius will not scaled automatic with it. Normally you must do this manually. This Command makes it for you.<br>
+Collisionbox and -radius will also updated when PCL_SetParticleScale() is called.</p>
+<table width="98%" border="0">
+  <tr> 
+    <td rowspan="2"> <b>handle:</b></td>
+    <td width="90%" rowspan="2"> 
+      <p>Cloud that will be updated. </p>
+    </td>
+  </tr>
+  <tr> </tr>
+</table>
+<b><A href="#back">back </A></b> 
+<hr>
+
+<p>This Library is freeware. Use this functions at your own risk. You can use this with your own commercial and noncommercial projects. Some Credits in your projects would be nice but not necessary. You´re freely to spread this product as freeware. Its not allowed to sell it or distibute it with software-collections. Its also not allowed for you to change the contents of this .zip file and place it your own Webspace for download. Do this only with the original archive. Changes are only made by me. </p>
+<p>Do you have Bug Reports or Feature request, please mail me. ( see below )</p>
+<p>Having Fun with it.</p>
+<p>Shodan</p>
+<p><a href="http://www.shodan.blitz-3d.de">www.shodan.blitz-3d.de</a></p>
+<p><A href="mailto:heinz-helge@gmx.de">heinz-helge@gmx.de</A></p>
+<table width="98%" border="0">
+</table>
+<table width="98%" border="0">
+</table>
+<table width="98%" border="0">
+</table>
+<table width="98%" border="0">
+</table>
+<table width="98%" border="0">
+</table>
+<table width="98%" border="0">
+</table></h3>
+</body>
+</html>
